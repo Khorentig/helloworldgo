@@ -1,0 +1,34 @@
+name: add_app_on_dockerhub
+
+on:
+  workflow_run:
+    workflows:
+      - "Go"
+    types:
+      - "completed"
+
+
+
+jobs:
+  add_dockerhub:
+   runs-on: ubuntu-latest
+
+   steps:
+     - uses: actions/checkout@v3
+     - name: Build Docker image
+       run:  docker build -t khorentig/mygoapp .
+
+     - name: Build Docker conteiner
+       run:  docker run  khorentig/mygoapp
+
+     -  name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: khorentig
+          password: ${{ secrets.DOCKERPW }}
+          
+     - name: Build and push
+       uses: docker/build-push-action@v3
+       with:
+          push: true
+          tags: khorentig/mygoapp:latest
